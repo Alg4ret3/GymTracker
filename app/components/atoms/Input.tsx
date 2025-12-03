@@ -12,11 +12,12 @@ interface InputProps {
   pattern?: string;
   title?: string;
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  className?: string; // <-- agregado
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   (
-    { label, name, type = "text", value, placeholder, onChange, required, pattern, title, onKeyDown },
+    { label, name, type = "text", value, placeholder, onChange, required, pattern, title, onKeyDown, className = "" },
     ref
   ) => {
     return (
@@ -33,7 +34,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           pattern={pattern}
           title={title}
           onKeyDown={onKeyDown}
-          className="w-full px-3 py-2 bg-gray-800 text-white rounded-lg outline-none border border-gray-700 focus:border-blue-500"
+          className={`w-full px-3 py-2 bg-gray-800 text-white rounded-lg outline-none border border-gray-700 focus:border-blue-500 ${className}`}
         />
       </div>
     );

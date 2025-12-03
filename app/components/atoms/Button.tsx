@@ -2,17 +2,19 @@
 import React from "react";
 import { FiChevronRight } from "react-icons/fi";
 
-export const Button = ({
-  text,
-  onClick
-}: {
+interface ButtonProps {
   text: string;
   onClick: () => void;
-}) => {
+  className?: string;
+  disabled?: boolean; // <-- agregado
+}
+
+export const Button = ({ text, onClick, className = "", disabled = false }: ButtonProps) => {
   return (
     <button
       onClick={onClick}
-      className="
+      disabled={disabled} // <-- aplicamos disabled
+      className={`
         w-full
         flex
         items-center
@@ -29,7 +31,10 @@ export const Button = ({
         transition-all
         duration-300
         active:scale-[0.98]
-      "
+        disabled:bg-gray-500
+        disabled:cursor-not-allowed
+        ${className}
+      `}
     >
       {text}
       <FiChevronRight className="text-lg" />

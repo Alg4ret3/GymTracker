@@ -94,10 +94,10 @@ export const EjercicioHistory = ({ userId }: { userId: string }) => {
                 <p className="text-gray-300 mb-2">Fecha: {ej[6]}</p>
                 <ul className="space-y-1">
                   <li>
-                    Peso: <span className="font-semibold">{ej[3]}</span>
+                    Peso: <span className="font-semibold">{ej[3]} Kg</span>
                   </li>
                   <li>
-                    Repeticiones: <span className="font-semibold">{ej[4]}</span>
+                    Repeticiones: <span className="font-semibold">{ej[4]} Rep </span>
                   </li>
                   <li>
                     Número de serie: <span className="font-semibold">{ej[5]}</span>
