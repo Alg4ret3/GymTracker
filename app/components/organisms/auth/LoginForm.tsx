@@ -4,13 +4,13 @@ import React, { useState } from "react";
 import { InputField } from "../../molecules/auth/InputFied";
 import { Button } from "../../atoms/Button";
 import Link from "next/link";
-import { HiEye, HiEyeOff } from "react-icons/hi";
+import { useRouter } from "next/navigation"; // Importamos el router
 
 export const LoginForm = () => {
   const [usuario, setUsuario] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // <- nuevo estado
+  const router = useRouter(); // Inicializamos el router
 
   const handleLogin = async () => {
     setError("");
@@ -34,8 +34,11 @@ export const LoginForm = () => {
         return;
       }
 
+      // Guardamos el userId en localStorage (opcional)
       localStorage.setItem("userId", data.userId);
-      window.location.href = "/dashboard";
+
+      // Redireccionamos al dashboard
+      router.push("/dashboard"); 
     } catch {
       setError("No se pudo conectar con el servidor.");
     }
@@ -60,23 +63,14 @@ export const LoginForm = () => {
           onChange={(e) => setUsuario(e.target.value)}
         />
 
-        <div className="relative">
-          <InputField
-            label="Contraseña"
-            name="password"
-            type={showPassword ? "text" : "password"} // <- toggle
-            value={password}
-            placeholder="Ingresa tu contraseña"
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <button
-            type="button"
-            className="absolute right-3 top-9 text-gray-500 hover:text-white transition cursor-pointer"
-            onClick={() => setShowPassword(!showPassword)}
-          >
-            {showPassword ? <HiEyeOff size={20} /> : <HiEye size={20} />}
-          </button>
-        </div>
+        <InputField
+          label="Contraseña"
+          name="password"
+          type="password"
+          value={password}
+          placeholder="Ingresa tu contraseña"
+          onChange={(e) => setPassword(e.target.value)}
+        />
 
         <Button text="Entrar" onClick={handleLogin} />
 

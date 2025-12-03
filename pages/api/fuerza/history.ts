@@ -9,9 +9,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const { userId } = req.query;
+    const { userId, nombre, all } = req.query;
 
-    // 🔍 Validación clara
     if (!userId) {
       return res.status(400).json({ error: "Falta el campo: userId" });
     }
@@ -30,12 +29,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const rows = data.data.values || [];
 
-    const filtered = rows
-      .filter((r) => r[1] === userId) // r[1] = Id_Usuario
-      .slice(-5); // Últimos 5 registros
+    // Filtrar por userId
+    let filtered = rows.filter((r) => r[1] === userId);
+
+    // Filtrar por nombre si existe
+    if (nombre && typeof nombre === "string") {
+      filtered = filtered.filter((r) => r[2].toLowerCase().includes(nombre.toLowerCase()));
+    }
+
+    // Si no se pide "all", limitar a últimos 5 registros
+    if (!all || all !== "true") {
+      filtered = filtered.slice(-5);
+    }
 
     return res.status(200).json({ ejercicios: filtered });
-
   } catch (err: any) {
     return res.status(500).json({ error: err.message });
   }

@@ -11,8 +11,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const { id, usuario } = req.body;
 
+    // Validamos que se envíen los campos requeridos
     if (!id || !usuario) {
-      return res.status(400).json({ error: "Id_Usuario y Usuario requeridos" });
+      return res.status(400).json({ error: "Id_Usuario y Usuario son obligatorios" });
     }
 
     const auth = new google.auth.GoogleAuth({
@@ -22,7 +23,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const sheets = google.sheets({ version: "v4", auth });
 
-    // Traemos columnas necesarias (A=Id_Usuario, D=Usuario)
+    // Obtenemos las columnas necesarias (A=Id_Usuario, D=Usuario)
     const data = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.SPREADSHEET_ID!,
       range: `USUARIOS!A:D`,
@@ -37,18 +38,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Validamos duplicados
     const idExists = rows.some((r) => r[0]?.toString().trim() === idInput);
     if (idExists) {
-      return res.status(400).json({ error: "La cedula ya existe" });
+      return res.status(400).json({ error: "La cédula ya existe" });
     }
 
     const usuarioExists = rows.some(
       (r) => r[3]?.toString().trim().toLowerCase() === usuarioInput
     );
     if (usuarioExists) {
-      return res.status(400).json({ error: "El nombre deUsuario ya existe" });
+      return res.status(400).json({ error: "El nombre de usuario ya existe" });
     }
 
-    // Si no hay duplicados
-    return res.status(200).json({ success: true, message: "Id y Usuario disponibles" });
+    // Si no hay duplicados, retornamos éxito
+    return res.status(200).json({ success: true, message: "Id y usuario disponibles" });
 
   } catch (err: any) {
     console.error("Error en check-user:", err);
