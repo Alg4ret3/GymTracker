@@ -12,7 +12,6 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// ✅ Metadatos actualizados para tu app GymTracker
 export const metadata: Metadata = {
   title: "GymTracker | Registro de Ejercicios y Progreso",
   description:
@@ -44,17 +43,13 @@ export const metadata: Metadata = {
     description: "Registra tus rutinas de fuerza y cardio fácilmente.",
   },
 };
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <head>
+        <link rel="icon" href="/Favicon.svg" />
+      </head>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {children}
       </body>
     </html>

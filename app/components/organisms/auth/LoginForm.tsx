@@ -4,11 +4,13 @@ import React, { useState } from "react";
 import { InputField } from "../../molecules/auth/InputFied";
 import { Button } from "../../atoms/Button";
 import Link from "next/link";
+import { HiEye, HiEyeOff } from "react-icons/hi";
 
 export const LoginForm = () => {
   const [usuario, setUsuario] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // <- nuevo estado
 
   const handleLogin = async () => {
     setError("");
@@ -58,14 +60,23 @@ export const LoginForm = () => {
           onChange={(e) => setUsuario(e.target.value)}
         />
 
-        <InputField
-          label="Contraseña"
-          name="password"
-          type="password"
-          value={password}
-          placeholder="Ingresa tu contraseña"
-          onChange={(e) => setPassword(e.target.value)}
-        />
+        <div className="relative">
+          <InputField
+            label="Contraseña"
+            name="password"
+            type={showPassword ? "text" : "password"} // <- toggle
+            value={password}
+            placeholder="Ingresa tu contraseña"
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <button
+            type="button"
+            className="absolute right-3 top-9 text-gray-500 hover:text-white transition cursor-pointer"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? <HiEyeOff size={20} /> : <HiEye size={20} />}
+          </button>
+        </div>
 
         <Button text="Entrar" onClick={handleLogin} />
 
