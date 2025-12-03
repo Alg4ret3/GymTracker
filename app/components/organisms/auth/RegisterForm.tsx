@@ -38,19 +38,24 @@ export const RegisterForm = () => {
 
     setLoading(true);
 
-    const { exists, error } = await checkUser({ id: form.id });
-    if (error) {
-      setMsg(error);
-      setLoading(false);
-      return;
-    }
-    if (exists) {
-      setMsg("Ya existe un usuario con esa cédula");
-      setLoading(false);
-      return;
-    }
-
     try {
+      // Verificamos que Id_Usuario y Usuario sean únicos
+      const { success, error } = await checkUser({ id: form.id, usuario: form.usuario });
+      console.log("checkUser result:", { success, error });
+
+      if (error) {
+        setMsg(error); // API ya devuelve cuál está duplicado
+        setLoading(false);
+        return;
+      }
+
+      if (!success) {
+        setMsg("El Id_Usuario o Usuario ya existen");
+        setLoading(false);
+        return;
+      }
+
+      // Si pasa la verificación, hacemos el registro
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -64,7 +69,8 @@ export const RegisterForm = () => {
         setMsg("Usuario registrado correctamente.");
         setForm({ id: "", nombre: "", apellido: "", usuario: "", password: "", email: "" });
       }
-    } catch {
+    } catch (err) {
+      console.error(err);
       setMsg("Error de conexión.");
     }
 
@@ -73,9 +79,6 @@ export const RegisterForm = () => {
 
   return (
     <div className="bg-zinc-900 p-10 rounded-3xl shadow-2xl w-full max-w-md border border-zinc-800 flex flex-col items-center">
-      {/* Enlace de volver */}
-
-
       <h2 className="text-white text-3xl font-bold mb-8 text-center">Crear cuenta</h2>
 
       <div className="w-full space-y-4">
@@ -85,13 +88,14 @@ export const RegisterForm = () => {
           text={loading ? "Registrando..." : "Registrar"}
           onClick={handleSubmit}
         />
-        
-      <Link
-        href="/" // Cambia esto a la ruta que quieras
-        className="self-start mb-4 text-blue-400 hover:text-blue-600 flex items-center gap-2  text-sm font-medium"
-      >
-        <span className="text-xl">←</span> Volver a iniciar sesión
-      </Link>
+
+        <Link
+          href="/"
+          className="self-start mb-4 text-blue-400 hover:text-blue-600 flex items-center gap-2 text-sm font-medium"
+        >
+          <span className="text-xl">←</span> Volver a iniciar sesión
+        </Link>
+
         {msg && <p className="text-sm text-center text-gray-300 mt-2">{msg}</p>}
       </div>
     </div>

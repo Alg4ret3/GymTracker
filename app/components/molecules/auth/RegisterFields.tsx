@@ -1,5 +1,7 @@
 "use client";
-import { InputField } from "./InputFied";
+import { useState, useRef } from "react";
+import { HiEye, HiEyeOff } from "react-icons/hi";
+import { Input } from "../../atoms/Input";
 
 interface RegisterFieldsProps {
   form: {
@@ -14,10 +16,27 @@ interface RegisterFieldsProps {
 }
 
 export const RegisterFields = ({ form, onChange }: RegisterFieldsProps) => {
+  const [showPassword, setShowPassword] = useState(false);
+
+  // Refs para cada input
+  const nombreRef = useRef<HTMLInputElement>(null);
+  const apellidoRef = useRef<HTMLInputElement>(null);
+  const usuarioRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
+
+  const handleKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    nextRef?: React.RefObject<HTMLInputElement | null>
+  ) => {
+    if (e.key === "Enter" && nextRef?.current) {
+      nextRef.current.focus();
+    }
+  };
+
   return (
     <div className="space-y-4">
-      {/* CÉDULA */}
-      <InputField
+      <Input
         label="Cédula"
         name="id"
         type="text"
@@ -27,10 +46,10 @@ export const RegisterFields = ({ form, onChange }: RegisterFieldsProps) => {
         pattern="^\d+$"
         title="Solo números"
         required
+        onKeyDown={(e) => handleKeyDown(e, nombreRef)}
       />
 
-      {/* NOMBRE */}
-      <InputField
+      <Input
         label="Nombre"
         name="nombre"
         type="text"
@@ -40,10 +59,11 @@ export const RegisterFields = ({ form, onChange }: RegisterFieldsProps) => {
         pattern="^[A-Za-z\s]+$"
         title="Solo letras y espacios"
         required
+        ref={nombreRef}
+        onKeyDown={(e) => handleKeyDown(e, apellidoRef)}
       />
 
-      {/* APELLIDO */}
-      <InputField
+      <Input
         label="Apellido"
         name="apellido"
         type="text"
@@ -53,10 +73,11 @@ export const RegisterFields = ({ form, onChange }: RegisterFieldsProps) => {
         pattern="^[A-Za-z\s]+$"
         title="Solo letras y espacios"
         required
+        ref={apellidoRef}
+        onKeyDown={(e) => handleKeyDown(e, usuarioRef)}
       />
 
-      {/* USUARIO */}
-      <InputField
+      <Input
         label="Usuario"
         name="usuario"
         type="text"
@@ -66,10 +87,11 @@ export const RegisterFields = ({ form, onChange }: RegisterFieldsProps) => {
         pattern="^[A-Za-z0-9_]+$"
         title="Solo letras, números y guion bajo"
         required
+        ref={usuarioRef}
+        onKeyDown={(e) => handleKeyDown(e, emailRef)}
       />
 
-      {/* EMAIL */}
-      <InputField
+      <Input
         label="Correo"
         name="email"
         type="email"
@@ -79,20 +101,32 @@ export const RegisterFields = ({ form, onChange }: RegisterFieldsProps) => {
         pattern="^[a-zA-Z0-9._%+-]+@gmail\.com$"
         title="Debe ser un correo válido de Gmail"
         required
+        ref={emailRef}
+        onKeyDown={(e) => handleKeyDown(e, passwordRef)}
       />
 
-      {/* CONTRASEÑA */}
-      <InputField
-        label="Contraseña"
-        name="password"
-        type="password"
-        value={form.password}
-        onChange={onChange}
-        placeholder="Ingrese su contraseña (letras y números)"
-        pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$"
-        title="Mínimo 6 caracteres, debe contener letras y números"
-        required
-      />
+      {/* Contraseña con toggle */}
+      <div className="relative">
+        <Input
+          label="Contraseña"
+          name="password"
+          type={showPassword ? "text" : "password"}
+          value={form.password}
+          onChange={onChange}
+          placeholder="Ingrese su contraseña (letras y números)"
+          pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$"
+          title="Mínimo 6 caracteres, debe contener letras y números"
+          required
+          ref={passwordRef}
+        />
+        <button
+          type="button"
+          className="absolute right-3 top-9 text-gray-500 hover:text-white transition cursor-pointer"
+          onClick={() => setShowPassword(!showPassword)}
+        >
+          {showPassword ? <HiEyeOff size={20} /> : <HiEye size={20} />}
+        </button>
+      </div>
     </div>
   );
 };

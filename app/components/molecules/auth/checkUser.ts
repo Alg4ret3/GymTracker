@@ -1,18 +1,17 @@
 "use client";
 
 interface CheckUserData {
-  id: string; // solo cédula
+  id: string;       // Id_Usuario
+  usuario: string;  // Usuario
 }
 
 interface CheckUserResult {
-  exists: boolean;
-  error?: string;
+  success: boolean; // true si ambos son únicos
+  error?: string;   // mensaje de error si existe duplicado
 }
 
 /**
- * Función que verifica si ya existe una cédula en la base de datos (Google Sheets)
- * @param data { id }
- * @returns { exists: boolean, error?: string }
+ * Verifica si ya existen Id_Usuario o Usuario en Google Sheets
  */
 export const checkUser = async (data: CheckUserData): Promise<CheckUserResult> => {
   try {
@@ -25,11 +24,13 @@ export const checkUser = async (data: CheckUserData): Promise<CheckUserResult> =
     const result = await res.json();
 
     if (!res.ok) {
-      return { exists: false, error: result.error || "Error al verificar cédula" };
+      // API devuelve error con mensaje específico
+      return { success: false, error: result.error || "Error al verificar Id_Usuario o Usuario" };
     }
 
-    return { exists: result.exists };
+    // API devuelve success: true si ambos son únicos
+    return { success: result.success ?? false };
   } catch (error) {
-    return { exists: false, error: "Error de conexión" };
+    return { success: false, error: "Error de conexión" };
   }
 };
