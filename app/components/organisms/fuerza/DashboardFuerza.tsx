@@ -1,24 +1,25 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { EjercicioForm } from "../../molecules/fuerza/EjercicioForm"; // Componente para registrar ejercicios
-import { EjercicioHistory } from "../../molecules/fuerza/EjercicioHistory"; // Componente para mostrar historial
+import { EjercicioForm } from "../../molecules/fuerza/EjercicioForm";
+import { EjercicioHistory } from "../../molecules/fuerza/EjercicioHistory";
 
-// Definición de clases usando variables de CSS para coherencia
-const PRIMARY_COLOR_BG_CLASS = "bg-[var(--color-primario)] hover:bg-[var(--color-primario-hover)]";
-const BACKGROUND_COLOR_CLASS = "bg-[var(--color-secundario)]"; // Fondo principal
-const TEXT_COLOR_CLASS = "text-[var(--foreground)]"; // Color del texto principal
-const ACCENT_COLOR_CLASS = "text-[var(--color-primario)]"; // Color de acento para títulos
+import { LogoutButton } from "../../molecules/fuerza/LogoutButton";
+import { DashboardFooter } from "../../molecules/fuerza/DashboardFooter";
+
+// Clases CSS usando variables para coherencia de color
+const PRIMARY_COLOR_BG_CLASS =
+  "bg-[var(--color-primario)] hover:bg-[var(--color-primario-hover)]";
+const BACKGROUND_COLOR_CLASS = "bg-[var(--color-secundario)]";
+const TEXT_COLOR_CLASS = "text-[var(--foreground)]";
+const ACCENT_COLOR_CLASS = "text-[var(--color-primario)]";
 
 export const DashboardFuerza = ({ userId }: { userId: string | null }) => {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  useEffect(() => setMounted(true), []);
 
-  // Función para cerrar sesión
   const logout = () => {
     localStorage.removeItem("userId");
     sessionStorage.removeItem("userId");
@@ -26,86 +27,64 @@ export const DashboardFuerza = ({ userId }: { userId: string | null }) => {
   };
 
   useEffect(() => {
-    if (!mounted) return;
-    if (!userId) {
-      logout();
-      return;
-    }
+    if (!mounted || userId) return;
 
-    const handlePopState = () => {
-      // Cierra la sesión automáticamente al detectar el evento 'popstate'
-      logout();
-    };
+    logout();
 
-    // Esto cierra la sesión si el usuario presiona el botón 'Atrás'
+    const handlePopState = () => logout();
     window.addEventListener("popstate", handlePopState);
-    
     return () => window.removeEventListener("popstate", handlePopState);
   }, [mounted, userId]);
 
-  // Si no está montado o no hay userId, no renderizar nada
-  if (!mounted || !userId) return null; 
+  if (!mounted || !userId) return null;
 
   return (
-    // Fondo más oscuro y consistente con la paleta
-    <div className={`p-6 md:p-10 min-h-screen ${BACKGROUND_COLOR_CLASS} ${TEXT_COLOR_CLASS}`}>
-      
-      {/* Encabezado del Dashboard */}
-      <header className="flex justify-between items-center py-4 mb-8 border-b border-gray-700">
-<h1
-  className={`
-    text-5xl md:text-6xl 
-    font-extrabold 
-    tracking-tight 
-    text-center 
-    ${ACCENT_COLOR_CLASS} 
-    drop-shadow-lg 
-    animate-[fadeIn_1s_ease-in-out]
-  `}
->
-  ¡Desafía tus límites hoy!
-</h1>
-
-
-        
-        {/* Botón de Cerrar Sesión con estilo de peligro */}
-        <button
-          onClick={logout}
-          className="bg-red-700 hover:bg-red-800 transition duration-300 px-6 py-2 rounded-lg text-white font-bold shadow-lg shadow-red-700/30 text-sm"
-        >
-          Cerrar sesión
-        </button>
+    <div
+      className={`min-h-screen p-6 md:p-10 flex flex-col ${BACKGROUND_COLOR_CLASS} ${TEXT_COLOR_CLASS}`}
+    >
+      {/* Encabezado */}
+      <header className="flex flex-col justify-center items-center mb-4 border-b border-gray-700 pb-2">
+        <h1 className={`flex items-center justify-center ${ACCENT_COLOR_CLASS}`}>
+          <img
+            src="/Favicon.svg"
+            alt="Logo"
+            className="w-50 h-50 md:w-24 md:h-24"
+          />
+        </h1>
       </header>
 
-      {/* Contenido principal: Formulario e Historial */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        {/* Columna principal para el Formulario de registro (2/3 del ancho en pantallas grandes) */}
+      {/* Contenido principal */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 flex-1">
+        {/* Formulario */}
         <div className="lg:col-span-2">
-          <div className="bg-gray-800 p-6 rounded-xl shadow-xl border border-gray-700/50">
-            <h2 className="text-2xl font-semibold mb-4 text-white border-b border-gray-700 pb-2">
+          <div className="bg-gray-800 p-6 rounded-2xl shadow-xl border border-gray-700/50 transition-all hover:scale-[1.01] duration-200">
+            <h2 className="text-xl font-semibold text-white flex items-center gap-3 mb-6">
+              <span className="w-1.5 h-6 bg-blue-500 rounded-full"></span>
               Registrar Nuevo Ejercicio
             </h2>
+
             <EjercicioForm userId={userId} />
           </div>
         </div>
-        
-        {/* Columna lateral para el Historial (1/3 del ancho en pantallas grandes) */}
+
+        {/* Historial */}
         <div className="lg:col-span-1">
-          <div className="bg-gray-800 p-6 rounded-xl shadow-xl border border-gray-700/50 h-full">
-            <h2 className="text-2xl font-semibold mb-4 text-white border-b border-gray-700 pb-2">
+          <div className="bg-gray-800 p-6 rounded-2xl shadow-xl border border-gray-700/50 h-full transition-all hover:scale-[1.01] duration-200">
+            <h2 className="text-xl font-semibold text-white flex items-center gap-3 mb-6">
+              <span className="w-1.5 h-6 bg-blue-500 rounded-full"></span>
               Últimos Registros
             </h2>
+
             <EjercicioHistory userId={userId} />
           </div>
         </div>
-        
       </div>
 
-      {/* Pie de página sutil (opcional) */}
-      <footer className="text-center mt-12 pt-4 text-gray-500 text-xs border-t border-gray-800">
-        © {new Date().getFullYear()} Plataforma de Gestión de Entrenamiento. Todos los derechos reservados.
-      </footer>
+      {/* Botón de logout */}
+      <LogoutButton logout={logout} />
+
+      {/* Footer */}
+      <DashboardFooter />
     </div>
   );
 };

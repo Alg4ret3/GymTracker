@@ -1,22 +1,33 @@
 "use client";
 import React, { useState } from "react";
-import { Button } from "../../atoms/Button";
-import { Input } from "../../atoms/Input";
-import { SerieInput, Serie } from "./SerieInput";
+import { Serie } from "./SerieInput";
+
+import { FormAlerts } from "./FormAlerts";
+import { FormNombreInput } from "./FormNombreInput";
+import { FormUnidadSelector } from "./FormUnidadSelector";
+import { FormSeriesList } from "./FormSeriesList";
+import { FormActions } from "./FormActions";
 
 const convertirLbAKg = (lb: number) => +(lb * 0.453592).toFixed(2);
 
 export const EjercicioForm = ({ userId }: { userId: string }) => {
   const [nombre, setNombre] = useState("");
   const [unidad, setUnidad] = useState<"kg" | "lb">("kg");
-  const [series, setSeries] = useState<Serie[]>([{ peso: "", repeticiones: "", numero_serie: "1" }]);
+  const [series, setSeries] = useState<Serie[]>([
+    { peso: "", repeticiones: "", numero_serie: "1" },
+  ]);
+
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
   const handleAddSerie = () => {
     setSeries([
       ...series,
-      { peso: "", repeticiones: "", numero_serie: (series.length + 1).toString() },
+      {
+        peso: "",
+        repeticiones: "",
+        numero_serie: (series.length + 1).toString(),
+      },
     ]);
   };
 
@@ -24,14 +35,22 @@ export const EjercicioForm = ({ userId }: { userId: string }) => {
     setSeries(series.filter((_, i) => i !== index));
   };
 
-  const handleChangeSerie = (index: number, field: keyof Serie, value: string) => {
-    // Validar que solo se puedan escribir números en peso y repeticiones
-    if ((field === "peso" || field === "repeticiones") && value !== "" && !/^\d*\.?\d*$/.test(value)) return;
+  const handleChangeSerie = (
+    index: number,
+    field: keyof Serie,
+    value: string
+  ) => {
+    if (
+      (field === "peso" || field === "repeticiones") &&
+      value !== "" &&
+      !/^\d*\.?\d*$/.test(value)
+    )
+      return;
 
     const updated = [...series];
     updated[index][field] = value;
 
-    // Si es la primera serie y hay más de una serie, autocompletar las demás series
+    // Propagar cambios de la serie 1
     if (index === 0 && (field === "peso" || field === "repeticiones")) {
       for (let i = 1; i < updated.length; i++) {
         updated[i][field] = value;
@@ -51,7 +70,8 @@ export const EjercicioForm = ({ userId }: { userId: string }) => {
 
     const seriesEnKg = series.map((s) => ({
       ...s,
-      peso: unidad === "lb" ? convertirLbAKg(Number(s.peso)).toString() : s.peso,
+      peso:
+        unidad === "lb" ? convertirLbAKg(Number(s.peso)).toString() : s.peso,
     }));
 
     try {
@@ -73,45 +93,21 @@ export const EjercicioForm = ({ userId }: { userId: string }) => {
   };
 
   return (
-    <div className="space-y-4 p-4 bg-gray-900 text-white rounded-lg">
-      <h2 className="font-bold text-xl">Agregar Ejercicio</h2>
-      {error && <p className="text-red-400">{error}</p>}
-      {success && <p className="text-green-400">Ejercicio agregado correctamente!</p>}
+    <div className="space-y-6 p-6 bg-gray-900/60 backdrop-blur-xl border border-gray-800 rounded-2xl shadow-xl">
 
-      <Input
-  name="nombreEjercicio"
-  label="Nombre del ejercicio"
-  value={nombre}
-  onChange={(e) => setNombre(e.target.value)}
-/>
+      <FormAlerts error={error} success={success} />
 
+      <FormNombreInput nombre={nombre} setNombre={setNombre} />
 
-      <div className="flex gap-2 items-center">
-        <span>Unidad:</span>
-        <select
-          className="bg-gray-800 text-white px-2 py-1 rounded"
-          value={unidad}
-          onChange={(e) => setUnidad(e.target.value as "kg" | "lb")}
-        >
-          <option value="kg">kg</option>
-          <option value="lb">lb</option>
-        </select>
-      </div>
+      <FormUnidadSelector unidad={unidad} setUnidad={setUnidad} />
 
-      {series.map((s, i) => (
-        <SerieInput
-          key={i}
-          serie={s}
-          index={i}
-          onChange={handleChangeSerie}
-          onRemove={handleRemoveSerie}
-        />
-      ))}
+      <FormSeriesList
+        series={series}
+        onChange={handleChangeSerie}
+        onRemove={handleRemoveSerie}
+      />
 
-      <div className="flex gap-2">
-        <Button text="Agregar Serie" onClick={handleAddSerie} />
-        <Button text="Guardar Ejercicio" onClick={handleSubmit} />
-      </div>
+      <FormActions onAdd={handleAddSerie} onSubmit={handleSubmit} />
     </div>
   );
 };
