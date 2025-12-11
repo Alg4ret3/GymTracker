@@ -8,10 +8,13 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 // Clases CSS usando variables
-const PRIMARY_COLOR_CLASS = "bg-[var(--color-primario)] hover:bg-[var(--color-primario-hover)] text-white";
-const SECONDARY_COLOR_BG_CLASS = "bg-[var(--color-fondo)]"; 
-const INPUT_BG_CLASS = "bg-gray-700 focus:ring-[var(--color-primario)] focus:border-[var(--color-primario)]"; 
-const LINK_COLOR_CLASS = "text-[var(--color-primario)] hover:text-[var(--color-primario-hover)]"; 
+const PRIMARY_COLOR_CLASS =
+  "bg-[var(--color-primario)] hover:bg-[var(--color-primario-hover)] text-white";
+const SECONDARY_COLOR_BG_CLASS = "bg-[var(--color-fondo)]";
+const INPUT_BG_CLASS =
+  "bg-gray-700 focus:ring-[var(--color-primario)] focus:border-[var(--color-primario)]";
+const LINK_COLOR_CLASS =
+  "text-[var(--color-primario)] hover:text-[var(--color-primario-hover)]";
 
 export const LoginForm = () => {
   const [usuario, setUsuario] = useState("");
@@ -49,7 +52,10 @@ export const LoginForm = () => {
   };
 
   return (
-    <div className={`${SECONDARY_COLOR_BG_CLASS} p-8 rounded-3xl shadow-2xl shadow-black/50 w-full max-w-sm mx-auto border border-gray-700`}>
+    <div
+      className={`${SECONDARY_COLOR_BG_CLASS} p-8 rounded-3xl shadow-2xl shadow-black/50 w-full max-w-sm mx-auto border border-gray-700`}
+      onKeyDown={(e) => e.key === "Enter" && handleLogin()} // <- ⭐ SE AGREGA ESTO ⭐
+    >
       <div className="flex justify-center mb-6">
         <Image
           src="/Favicon.svg"
@@ -70,7 +76,7 @@ export const LoginForm = () => {
       {error && (
         <div className="bg-red-900/50 border border-red-500 p-3 rounded-lg mb-5 transition duration-300">
           <p className="text-red-300 text-center text-sm font-medium">
-            ⚠️ {error}
+            {error}
           </p>
         </div>
       )}
