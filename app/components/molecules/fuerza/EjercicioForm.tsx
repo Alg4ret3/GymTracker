@@ -7,12 +7,14 @@ import { FormNombreInput } from "./FormNombreInput";
 import { FormUnidadSelector } from "./FormUnidadSelector";
 import { FormSeriesList } from "./FormSeriesList";
 import { FormActions } from "./FormActions";
+import { FormCategoriaSelector } from "./FormCategoriaSelector"; 
 
 const convertirLbAKg = (lb: number) => +(lb * 0.453592).toFixed(2);
 
 export const EjercicioForm = ({ userId }: { userId: string }) => {
   const [nombre, setNombre] = useState("");
   const [unidad, setUnidad] = useState<"kg" | "lb">("kg");
+  const [categoria, setCategoria] = useState(""); // ✅ Categoría
   const [series, setSeries] = useState<Serie[]>([
     { peso: "", repeticiones: "", numero_serie: "1" },
   ]);
@@ -50,7 +52,7 @@ export const EjercicioForm = ({ userId }: { userId: string }) => {
     const updated = [...series];
     updated[index][field] = value;
 
-    // Propagar cambios de la serie 1
+    // Propaga cambios de serie 1
     if (index === 0 && (field === "peso" || field === "repeticiones")) {
       for (let i = 1; i < updated.length; i++) {
         updated[i][field] = value;
@@ -65,6 +67,7 @@ export const EjercicioForm = ({ userId }: { userId: string }) => {
     setSuccess(false);
 
     if (!nombre) return setError("Ingresa el nombre del ejercicio.");
+    if (!categoria) return setError("Selecciona la categoría del ejercicio.");
     if (series.some((s) => !s.peso || !s.repeticiones))
       return setError("Todas las series deben tener peso y repeticiones.");
 
@@ -78,7 +81,13 @@ export const EjercicioForm = ({ userId }: { userId: string }) => {
       const res = await fetch("/api/fuerza/add", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, nombre, series: seriesEnKg }),
+        body: JSON.stringify({
+          userId,
+          nombre,
+          categoria, // ✅ Enviar categoría
+          unidad,
+          series: seriesEnKg,
+        }),
       });
 
       const data = await res.json();
@@ -86,6 +95,7 @@ export const EjercicioForm = ({ userId }: { userId: string }) => {
 
       setSuccess(true);
       setNombre("");
+      setCategoria(""); // ✅ Reset categoría
       setSeries([{ peso: "", repeticiones: "", numero_serie: "1" }]);
     } catch {
       setError("Error al conectar con el servidor.");
@@ -98,6 +108,9 @@ export const EjercicioForm = ({ userId }: { userId: string }) => {
       <FormAlerts error={error} success={success} />
 
       <FormNombreInput nombre={nombre} setNombre={setNombre} />
+
+      {/* Selector de Categoría */}
+      <FormCategoriaSelector categoria={categoria} setCategoria={setCategoria} />
 
       <FormUnidadSelector unidad={unidad} setUnidad={setUnidad} />
 
